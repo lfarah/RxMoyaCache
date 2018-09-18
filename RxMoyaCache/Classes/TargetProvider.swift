@@ -19,7 +19,7 @@ public struct TargetProvider<Provider: MoyaProviderType> {
         self.provider = provider
     }
     
-    public func request(callbackQueue: DispatchQueue? = nil) -> Observable<Response> {
+    public func request(callbackQueue: DispatchQueue? = nil, isCache: Bool) -> Observable<Response> {
         let source = Single.create { single -> Disposable in
             let cancellableToken = self.provider.request(self.target,
                                                          callbackQueue: callbackQueue,
@@ -38,7 +38,7 @@ public struct TargetProvider<Provider: MoyaProviderType> {
             }
         }.storeCachedResponse(for: target).asObservable()
         
-        if let response = try? target.cachedResponse(),
+        if isCache, let response = try? target.cachedResponse(),
             MoyaCache.shared.storagePolicyClosure(response) {
             return source.startWith(response)
         }
