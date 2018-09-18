@@ -28,7 +28,7 @@ public struct TargetProvider<Provider: MoyaProviderType> {
                 switch result {
                 case let .success(response):
                     single(.success(response))
-                case let .failure(error):
+                case !isCache, let .failure(error):
                     single(.error(error))
                 }
             }
