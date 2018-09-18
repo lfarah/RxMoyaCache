@@ -28,15 +28,17 @@ public struct TargetProvider<Provider: MoyaProviderType> {
                 switch result {
                 case let .success(response):
                     single(.success(response))
-                case !isCache, let .failure(error):
-                    single(.error(error))
+                case let .failure(error):
+                    if !isCache {
+                        single(.error(error))
+                    }
                 }
             }
             
             return Disposables.create {
                 cancellableToken.cancel()
             }
-        }.storeCachedResponse(for: target).asObservable()
+            }.storeCachedResponse(for: target).asObservable()
         
         if isCache, let response = try? target.cachedResponse(),
             MoyaCache.shared.storagePolicyClosure(response) {
